@@ -1,0 +1,7 @@
+env
+.idea
+.DS_Store
+.ds_store
+.ds_Store
+datasets/
+Tensor_Flow/
