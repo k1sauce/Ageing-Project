@@ -1,0 +1,11 @@
+library(neuralnet)
+library(MonoPoly)
+library(polynom)
+source("~/R/ageing/functions/profile.r")
+load("~/R/ageing/datasets/alzheimers/females/vec_age_fc_ad.r")
+vec_age_female_controls <- vec_age
+rm(vec_age)
+load("~/R/ageing/datasets/alzheimers/females/brain_controls_mvalues_female_probes_removed.r")
+setwd("~/R/ageing/datasets/alzheimers/females")
+print("start profile")
+profile(vec_age = vec_age_female_controls, mvalues = brain_controls_mvalues_female_preprocessed, alpha = 0.5, rss = 100)
