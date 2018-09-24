@@ -16,8 +16,10 @@
 # blood_controls_mvalues_male.r AND vec_age_male_blood_controls.r, respectively, by hand
 
 # The corrected mvalues and age vector were then used in
-# 4) s_preprocess_remove_probes_blood_controls > 5) s_cor_test_male_blood_control.r > 6) s_significant_data_table_creation.r
-# > 7) s_fill_na_male_blood.r > 8) s_single_gse_nn.r 9) s_age_prediction_males.R
+# 4) s_preprocess_remove_probes_blood_controls > 5) s_cor_test_male_blood_control.r 
+# It is also necessary to convert the diseased beta values to mvalues with 6) s_beta_values_to_mvalues_female_blood_diseased.r
+# this and the cor_test ouput is use in 7) s_significant_data_table_creation.r
+# 8) s_fill_na_male_blood.r > 9) s_single_gse_nn.r 10) s_age_prediction_males.R
 
 #single gse 1) s_single_gse_nn to define probe set
 
@@ -25,11 +27,61 @@
 # alzheimers workflow
 ###############
 # FEMALES
-# 1) s_beta_values_to_mvalues_female_blood. input is beta_values_fc_ad.r, 
+# 1) s_beta_values_to_mvalues_female_brain. input is beta_values_fc_ad.r, 
 #                                           output is brain_controls_mvalues_female.r
-# 2) s_preprocess_remove_probes_brain_control.  input is brain_controls_mvalues_female.r, probestoremove.r, female_removechrYprobes.r
+# 2) s_preprocess_remove_probes_brain_control_females.  input is brain_controls_mvalues_female.r, probestoremove.r, female_removechrYprobes.r
 #                                               output is brain_controls_mvalues_female_probes_removed.r
 # 3) s_cor_test_female_brain_control.r input is vec_age_female_controls.r, brain_controls_mvalues_female_probes_removed.r
 #                                      output is the output of functions/profile.r
+# 4) s_beta_values_to_mvalues_female_brain_diseased.r input is brain_diseased_betavalues_female.r
+#                                       output is brain_diseased_mvalues_female.r
+# 5) s_significant_data_table_creation.r input is:
+# RES5k - 5000 most significant probes of RES table
+# POLYNOMIALS5k - polynomial models of 5000 most significant probes
+# mvalues_5k_brain_controls_males - the mvalues of male brain controls for the 5000 probes
+# mvalues_5k_brain_diseased_males - the mvalues of the male brain diseased for the 5000 probes
+# The output is:
+# mvalues_5k_brain_controls_females.r
+# mvalues_5k_brain_diseased_females.r
+# RES5k - 5000 most significant probes of RES table
+# POLYNOMIALS5k - polynomial models of 5000 most significant probes
+# next fill in the missing values with
+# 8) s_fill_na_female_brain.r
+# 
+# 9) confounding test with s_nn_confound_test_dataset.r result is 69% multiple classes
 #
-
+# 10) s_5k_gw_nn.r result is 77% accuracy for disease prediction.
+  #69/90 = 77%
+  #n_disease 21
+  #n_control 69
+  #n_total 90
+  #TP = "has disease 1 and predict disease 1": 15
+  #FP = "does not have disease 0 and predict disease 1": 15
+  #TN = "does not have disease 0 and predict disease 0": 54
+  #FN = "has disease 1 and predict disease 0": 6
+# 11) s_age_prediction_females # r = 0.968, MAE = 4.8 years
+#MALES
+#1) s_beta_values_to_mvalues_male_brain. input is beta_values_mc_ad.r
+#                                        output is brain_controls_mvalues_male.r
+#2) s_preprocess_remove_probes_brain_control_males.  input is brain_controls_mvalues_male.r, probestoremove.r
+#                                                     output is brain_controls_mvalues_male_probes_removed.r
+#3) s_cor_test_male_brain_control.r input is vec_age_male_controls.r, brain_controls_mvalues_male_probes_removed.r
+#                                      output is the output of functions/profile.r
+#4) s_beta_values_to_mvalues_male_brain_diseased.r input is brain_diseased_betavalues_male.r
+#                                       output is brain_diseased_mvalues_male.r
+# 5) s_significant_data_table_creation.r input is:
+# RES5k - 5000 most significant probes of RES table
+# POLYNOMIALS5k - polynomial models of 5000 most significant probes
+# mvalues_5k_brain_controls_males - the mvalues of male brain controls for the 5000 probes
+# mvalues_5k_brain_diseased_males - the mvalues of the male brain diseased for the 5000 probes
+# The output is:
+# mvalues_5k_brain_controls_females.r
+# mvalues_5k_brain_diseased_females.r
+# RES5k - 5000 most significant probes of RES table
+# POLYNOMIALS5k - polynomial models of 5000 most significant probes
+# next fill in the missing values with
+# 8) s_fill_na_female_brain.r
+# 9) skip confounding test since like females
+################
+#
+#

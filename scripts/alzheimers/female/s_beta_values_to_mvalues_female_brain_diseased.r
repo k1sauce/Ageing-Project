@@ -1,19 +1,29 @@
-#load in the beta values of the blood tissue controls for males
-load("~/R/ageing/datasets/rheumatoid_arthritis/males/blood_diseased_betavalues_male.r")
+#load in the beta values of the brain tissue controls for females
+load("~/R/ageing/datasets/alzheimers/females/brain_diseased_betavalues_female.r")
 
 # define the m.value function. The m.value function reduces heteroscedasticity among illumina methylation array
 # beta values by converting beta values into m values. 
 
-m.values = function(x){
-  log2(x/(1-x))
-}
+source("~/R/ageing/functions/m_values.r")
 
-tmp <- blood_diseased_betavalues_male
-tmp <- m.values(blood_diseased_betavalues_male)
+tmp <- brain_diseased_betavalues_female
+
+#This for loop creates an index which tells us which columns already contain m values.
+
+index <- c()
+for (i in 1:dim(tmp)[2]){
+  if (max(tmp[,i], na.rm = T) > 1 | min(tmp[,i], na.rm = T) < 0){
+    index <- c(index, i)
+  }
+}
+index
+#
+
+tmp <- m.values(brain_diseased_betavalues_female)
 
 tmp[tmp > 6] <- 6
 tmp[tmp < -6] <- -6
 
-setwd("~/R/ageing/datasets/rheumatoid_arthritis/males")
-blood_diseased_mvalues_male <- tmp
-save(blood_diseased_mvalues_male, file= "blood_diseased_mvalues_male.r")
+setwd("~/R/ageing/datasets/alzheimers/females")
+brain_diseased_mvalues_female <- tmp
+save(brain_diseased_mvalues_female, file= "brain_diseased_mvalues_female.r")
