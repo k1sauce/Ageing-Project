@@ -1,11 +1,11 @@
-load("~/R/ageing/datasets/alzheimers/males/na_fill_mvalues_male_brain_controls.r")
-load("~/R/ageing/datasets/alzheimers/males/na_fill_mvalues_male_brain_diseased.r")
+load("~/R/ageing/datasets/nafld/females/na_fill_mvalues_female_liver_controls.r")
+load("~/R/ageing/datasets/nafld/females/na_fill_mvalues_female_liver_diseased.r")
 
-healthy <- t(na_fill_mvalues_male_brain_controls)
-disease <- t(na_fill_mvalues_male_brain_diseased)
+healthy <- t(na_fill_mvalues_female_liver_controls)
+disease <- t(na_fill_mvalues_female_liver_diseased)
 
-healthy_index <- sample(379, 0.5*379)
-disease_index <- sample(25, 0.8*25)
+healthy_index <- sample(75, 0.9*75)
+disease_index <- sample(26, 0.9*26)
 
 healthy_train <- healthy[healthy_index,]
 disease_train <- disease[disease_index,]
@@ -132,22 +132,42 @@ yx_train <- cbind(y_train,x_train[,probe_index])
 colnames(yx_train)[1] <- "y"
 n <- colnames(yx_train)
 f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
-nn <- neuralnet(f,data=yx_train,hidden=c(200,100,10),linear.output=F, act.fct = "logistic", err.fct = "ce")
+nn <- neuralnet(f,data=yx_train,hidden=c(100),linear.output=F, act.fct = "logistic", err.fct = "ce")
 
+gw <- nn$generalized.weights[[1]]
+vinputs <- apply(gw, MARGIN = 2, FUN = var, na.rm=T)
+table(vinputs > 1)
+summary(vinputs)
+tmp <- data.frame(colnames(yx_train)[2:388], vinputs)
+colnames(tmp) <- c("Probe","G_Weight")
+varGweightnn <- tmp
+varGweightnn <- varGweightnn[order(-varGweightnn$G_Weight),]
+x <- varGweightnn$G_Weight
+names(x) <- varGweightnn$Probe
+source("~/R/ageing/functions/double_mad_from_med.r")
+xres <- x[DoubleMADsFromMedian(x) > 1]
+probe_index_gw <- names(xres)
+
+yx_train <- cbind(y_train,x_train[,probe_index])
+colnames(yx_train)[1] <- "y"
+n <- colnames(yx_train)
+f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
+nn <- neuralnet(f,data=yx_train,hidden=c(100),linear.output=F, act.fct = "logistic", err.fct = "ce")
+save(nn, file = "nn_pi.r")
 
 #########
 
-setwd("~/R/ageing/datasets/alzheimers/males")
+setwd("~/R/ageing/datasets/nafld/females")
 save(yx_train, file = "yx_train.r")
-load("~/R/ageing/datasets/alzheimers/males/yx_train.r")
+load("~/R/ageing/datasets/nafld/females/yx_train.r")
 
 x_test <- rbind(healthy_test, disease_test)
 y_test <- data.frame(c(rep(0,dim(healthy_test)[1]),rep(1,dim(disease_test)[1]))) # can also use extra blood data in validation
 yx_test <- cbind(y_test,x_test)
 colnames(yx_test)[1] <- "y"
-setwd("~/R/ageing/datasets/alzheimers/males")
+setwd("~/R/ageing/datasets/nafld/females")
 save(yx_test, file = "yx_test.r")
-load("~/R/ageing/datasets/alzheimers/males/yx_test.r")
+load("~/R/ageing/datasets/nafld/females/yx_test.r")
 
 
 # validation
@@ -160,18 +180,18 @@ hist(prdf$delta)
 sum(abs(prdf$delta)>0.5)
 
 
-# 15/195 = 92%
-# n_disease 5
-# n_control 190
-# n_total 195
+# 11/11 = 100%
+# n_disease 3
+# n_control 8
+# n_total 11
 
-#TP = "has disease 1 and predict disease 1": 5
+#TP = "has disease 1 and predict disease 1": 3
 TP = sum(prdf$X2 == 1 & prdf$X1 > 0.5)
 
-#FP = "does not have disease 0 and predict disease 1": 15
+#FP = "does not have disease 0 and predict disease 1": 0
 FP = sum(prdf$X2 == 0 & prdf$X1 > 0.5)
 
-#TN = "does not have disease 0 and predict disease 0": 175
+#TN = "does not have disease 0 and predict disease 0": 8
 TN = sum(prdf$X2 == 0 & prdf$X1 < 0.5)
 
 #FN = "has disease 1 and predict disease 0": 0
