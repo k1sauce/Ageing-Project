@@ -1,5 +1,5 @@
 setwd("~/R/ageing/datasets/rheumatoid_arthritis/males/GSE42861_ra")
-load("~/R/ageing/datasets/rheumatoid_arthritis/males/GSE42861_ra/probe_index_gw_male_430.r")
+load("~/R/ageing/datasets/rheumatoid_arthritis/males/GSE42861_ra/single_gse_gw_probe_index_male.r")
 setwd("~/R/ageing/datasets/rheumatoid_arthritis/males")
 load("~/R/ageing/datasets/rheumatoid_arthritis/males/na_fill_mvalues_male_blood_diseased.r")
 load("~/R/ageing/datasets/rheumatoid_arthritis/males/na_fill_mvalues_male_blood_controls.r")
@@ -91,14 +91,14 @@ history <- model %>% fit(
 plot(history)
 
 trainagep <- predict(model, x = x_train)
-mean(abs(trainagep - y_train))
+mean(abs(trainagep - y_train)) # 3.15 years
 hist(trainagep - y_train)
 cor(y = trainagep, x = y_train)
 
 testagep <- predict(model, x = x_test)
-mean(abs(testagep - y_test)) # mean error is 11 years
-cor(y = testagep, x = y_test)
-plot(y = testagep, x = y_test)
+mean(abs(testagep - y_test)) # mean abs error is 5.17 years
+cor(y = testagep, x = y_test) # r = 0.945
+plot(y = testagep, x = y_test, xlab = "True Age", ylab = "Predicted Age", main = "Male Arthritis - Healthy")
 hist(testagep - y_test)
 
 score <- model %>% evaluate(
@@ -125,6 +125,10 @@ x_diseased <- as.matrix(age_yx_diseased)
 y_diseased <- vec_age_male_blood_diseased
 
 predydis <- predict(model, x = x_diseased)
-mean(predydis - y_diseased)
+mean(predydis - y_diseased) # - 10 years below expected, 
+mean(abs(predydis - y_diseased)) # 10 years MAE
 hist(predydis - y_diseased)
+plot(y = predydis, x = y_diseased, xlab = "True Age", ylab = "Predicted Age", main = "Male Arthritis - Diseased")
+cor(y = predydis, x = y_diseased) # r = 0.75
+
 # 

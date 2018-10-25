@@ -36,10 +36,20 @@
 # 8) s_fill_na_male_blood.r
 # 9) s_nn_dataset_confounding_check yes confounding
 # 10) s_single_gse_nn.r 
-#   disease prediction for single GSE data is 
-# 11) s_age_prediction_males.R
+#   disease prediction for single GSE data is 43/60 = 71%
+#   43/60 = 71%
+#   n_disease 31
+#   n_control 29
+#   n_total 60
+#   TP = "has disease 1 and predict disease 1": 20
+#   FP = "does not have disease 0 and predict disease 1": 7
+#   TN = "does not have disease 0 and predict disease 0": 22
+#   FN = "has disease 1 and predict disease 0": 11
 #
-# single gse 1) s_single_gse_nn to define probe set
+# 11) s_age_prediction_males.r, healthy samples MAE is 10 years, with average of -10 years higher age,
+# correlation is moderat r = 0.75
+#
+#
 #
 ###########
 # FEMALES

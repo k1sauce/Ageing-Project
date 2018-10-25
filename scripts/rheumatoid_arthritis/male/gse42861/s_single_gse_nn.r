@@ -119,6 +119,7 @@ n <- colnames(yx_train_gw)
 f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
 nn_gw <- neuralnet(f,data=yx_train_gw,hidden=c(200,100,10),linear.output=F, act.fct = "logistic", err.fct = "ce")
 save(nn_gw, file="nn_yx_train_gw.r")
+load("nn_yx_train_gw.r")
 
 delta <- as.numeric(data.frame(nn_gw$net.result)[,1])-as.numeric(nn_gw$response)
 sum(abs(delta>0.5))
@@ -130,6 +131,7 @@ yx_test_gw <- cbind(yx_test[,1],yx_test_gw)
 colnames(yx_test_gw)[1] <- "y"
 setwd("~/R/ageing/datasets/rheumatoid_arthritis/males/GSE42861_ra")
 save(yx_test_gw, file = "yx_test_gw.r")
+load("yx_test_gw.r")
 pr_nn_gw <- compute(nn_gw,yx_test_gw[,2:431])
 prdf <- cbind(pr_nn_gw$net.result,yx_test_gw[,1])
 prdf <- data.frame(prdf)
@@ -137,8 +139,27 @@ prdf$delta <- prdf$X2 - prdf$X1
 hist(prdf$delta)
 sum(abs(prdf$delta)>0.5)
 
+save(probe_index, file = "single_gse_gw_probe_index_male.r")
+load("single_gse_gw_probe_index_male.r")
+
 #43/60 = 71%
-save(probe_index, file = "probe_index_gw_male_430.r")
+# n_disease 31
+# n_control 29
+# n_total 60
+
+#TP = "has disease 1 and predict disease 1": 20
+TP = sum(prdf$X2 == 1 & prdf$X1 > 0.5) 
+
+#FP = "does not have disease 0 and predict disease 1": 7
+FP = sum(prdf$X2 == 0 & prdf$X1 > 0.5)
+
+#TN = "does not have disease 0 and predict disease 0": 22
+TN = sum(prdf$X2 == 0 & prdf$X1 < 0.5)
+
+#FN = "has disease 1 and predict disease 0": 11
+FN = sum(prdf$X2 == 1 & prdf$X1 < 0.5)
+
+
 
 #tensor flow
 library(keras)
@@ -192,6 +213,9 @@ cat('Test accuracy:', score[[2]], '\n')
 
 
 
+
+
+###################################################################
 install.packages("randomForest")
 library(randomForest)
 ram.rf=randomForest(y ~ . , data = yx_train, mtry = 70, ntree = 500, importance = T)
