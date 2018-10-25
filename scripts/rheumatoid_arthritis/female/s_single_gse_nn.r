@@ -7,12 +7,17 @@ raf <- subset(ratmp, ratmp[,2] == "gender: f")
 GSE42861IDs <- as.character(raf[,1])
 rm(ra)
 
+##
+
 na_fill_table <- cbind(na_fill_mvalues_female_blood_controls, na_fill_mvalues_female_blood_diseased)
 gse <- na_fill_table[,GSE42861IDs]
 diseaseid <- colnames(na_fill_mvalues_female_blood_diseased)
 mts <- match(diseaseid, colnames(gse))
+
 disease <- gse[,mts]
 healthy <- gse[,-mts]
+
+####
 
 
 healthy <- t(healthy)
@@ -28,33 +33,163 @@ healthy_test <- healthy[-healthy_index,]
 disease_test <- disease[-disease_index,]
 
 x_train <- rbind(healthy_train,disease_train)
-y_train <- data.frame(c(rep(0,167),rep(1,177)))
-yx_train <- cbind(y_train,x_train)
+y_train <- data.frame(c(rep(0,dim(healthy_train)[1]),rep(1,dim(disease_train)[1])))
+
+###########################
+############ train 1000 features at a time
+yx_train <- cbind(y_train,x_train[,1:1000])
 colnames(yx_train)[1] <- "y"
-setwd("~/R/ageing/datasets/rheumatoid_arthritis/females")
-save(yx_train, file = "yx_train_single_gse.r")
-load("~/R/ageing/datasets/rheumatoid_arthritis/females/yx_train_single_gse.r")
-
-x_test <- rbind(healthy_test, disease_test)
-y_test <- data.frame(c(rep(0,72),rep(1,76)))
-yx_test <- cbind(y_test,x_test)
-colnames(yx_test)[1] <- "y"
-setwd("~/R/ageing/datasets/rheumatoid_arthritis/females")
-save(yx_test, file = "yx_test_single_gse.r")
-load("~/R/ageing/datasets/rheumatoid_arthritis/females/yx_test_single_gse.r")
-
-library(neuralnet)
 n <- colnames(yx_train)
 f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
 nn <- neuralnet(f,data=yx_train,hidden=c(200,100,10),linear.output=F, act.fct = "logistic", err.fct = "ce")
-save(nn, file="nn_yx_train.r")
-load("~/R/ageing/datasets/rheumatoid_arthritis/females/nn_yx_train.r")
 
-delta <- as.numeric(data.frame(nn$net.result)[,1])-as.numeric(nn$response)
-sum(abs(delta>0.5))
+gw <- nn$generalized.weights[[1]]
+vinputs <- apply(gw, MARGIN = 2, FUN = var, na.rm=T)
+table(vinputs > 1)
+summary(vinputs)
+tmp <- data.frame(colnames(yx_train)[2:1001], vinputs)
+colnames(tmp) <- c("Probe","G_Weight")
+varGweightnn <- tmp
+varGweightnn <- varGweightnn[order(-varGweightnn$G_Weight),]
+x <- varGweightnn$G_Weight
+names(x) <- varGweightnn$Probe
+source("~/R/ageing/functions/double_mad_from_med.r")
+xres <- x[DoubleMADsFromMedian(x) > 3]
+probe_index1to1000 <- names(xres)
+save(probe_index1to1000, file = "probe_index1to1000.r")
+
+#1001 2000
+yx_train <- cbind(y_train,x_train[,1001:2000])
+colnames(yx_train)[1] <- "y"
+n <- colnames(yx_train)
+f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
+nn <- neuralnet(f,data=yx_train,hidden=c(200,100,10),linear.output=F, act.fct = "logistic", err.fct = "ce")
+
+gw <- nn$generalized.weights[[1]]
+vinputs <- apply(gw, MARGIN = 2, FUN = var, na.rm=T)
+table(vinputs > 1)
+summary(vinputs)
+tmp <- data.frame(colnames(yx_train)[2:1001], vinputs)
+colnames(tmp) <- c("Probe","G_Weight")
+varGweightnn <- tmp
+varGweightnn <- varGweightnn[order(-varGweightnn$G_Weight),]
+x <- varGweightnn$G_Weight
+names(x) <- varGweightnn$Probe
+source("~/R/ageing/functions/double_mad_from_med.r")
+xres <- x[DoubleMADsFromMedian(x) > 3]
+probe_index1001to2000 <- names(xres)
+save(probe_index1001to2000, file = "probe_index1001to2000.r")
+# 2001 3000
+yx_train <- cbind(y_train,x_train[,2001:3000])
+colnames(yx_train)[1] <- "y"
+n <- colnames(yx_train)
+f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
+nn <- neuralnet(f,data=yx_train,hidden=c(200,100,10),linear.output=F, act.fct = "logistic", err.fct = "ce")
+
+gw <- nn$generalized.weights[[1]]
+vinputs <- apply(gw, MARGIN = 2, FUN = var, na.rm=T)
+table(vinputs > 1)
+summary(vinputs)
+tmp <- data.frame(colnames(yx_train)[2:1001], vinputs)
+colnames(tmp) <- c("Probe","G_Weight")
+varGweightnn <- tmp
+varGweightnn <- varGweightnn[order(-varGweightnn$G_Weight),]
+x <- varGweightnn$G_Weight
+names(x) <- varGweightnn$Probe
+source("~/R/ageing/functions/double_mad_from_med.r")
+xres <- x[DoubleMADsFromMedian(x) > 3]
+probe_index2001to3000 <- names(xres)
+save(probe_index2001to3000, file = "probe_index2001to3000.r")
+#3001 4000
+yx_train <- cbind(y_train,x_train[,3001:4000])
+colnames(yx_train)[1] <- "y"
+n <- colnames(yx_train)
+f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
+nn <- neuralnet(f,data=yx_train,hidden=c(200,100,10),linear.output=F, act.fct = "logistic", err.fct = "ce")
+
+gw <- nn$generalized.weights[[1]]
+vinputs <- apply(gw, MARGIN = 2, FUN = var, na.rm=T)
+table(vinputs > 1)
+summary(vinputs)
+tmp <- data.frame(colnames(yx_train)[2:1001], vinputs)
+colnames(tmp) <- c("Probe","G_Weight")
+varGweightnn <- tmp
+varGweightnn <- varGweightnn[order(-varGweightnn$G_Weight),]
+x <- varGweightnn$G_Weight
+names(x) <- varGweightnn$Probe
+source("~/R/ageing/functions/double_mad_from_med.r")
+xres <- x[DoubleMADsFromMedian(x) > 3]
+probe_index3001to4000 <- names(xres)
+save(probe_index3001to4000, file = "probe_index3001to4000.r")
+#4001 5000
+yx_train <- cbind(y_train,x_train[,4001:5000])
+colnames(yx_train)[1] <- "y"
+n <- colnames(yx_train)
+f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
+nn <- neuralnet(f,data=yx_train,hidden=c(200,100,10),linear.output=F, act.fct = "logistic", err.fct = "ce")
+
+gw <- nn$generalized.weights[[1]]
+vinputs <- apply(gw, MARGIN = 2, FUN = var, na.rm=T)
+table(vinputs > 1)
+summary(vinputs)
+tmp <- data.frame(colnames(yx_train)[2:1001], vinputs)
+colnames(tmp) <- c("Probe","G_Weight")
+varGweightnn <- tmp
+varGweightnn <- varGweightnn[order(-varGweightnn$G_Weight),]
+x <- varGweightnn$G_Weight
+names(x) <- varGweightnn$Probe
+source("~/R/ageing/functions/double_mad_from_med.r")
+xres <- x[DoubleMADsFromMedian(x) > 3]
+probe_index4001to5000 <- names(xres)
+save(probe_index4001to5000, file = "probe_index4001to5000.r")
+#
+probe_index <- c(probe_index1to1000,probe_index1001to2000,probe_index2001to3000,probe_index3001to4000,probe_index4001to5000)
+save(probe_index, file = "probe_index.r")
+#
+yx_train <- cbind(y_train,x_train[,probe_index])
+colnames(yx_train)[1] <- "y"
+n <- colnames(yx_train)
+f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
+nn <- neuralnet(f,data=yx_train,hidden=c(100),linear.output=F, act.fct = "logistic", err.fct = "ce")
+
+gw <- nn$generalized.weights[[1]]
+vinputs <- apply(gw, MARGIN = 2, FUN = var, na.rm=T)
+table(vinputs > 1)
+summary(vinputs)
+tmp <- data.frame(colnames(yx_train)[2:269], vinputs)
+colnames(tmp) <- c("Probe","G_Weight")
+varGweightnn <- tmp
+varGweightnn <- varGweightnn[order(-varGweightnn$G_Weight),]
+x <- varGweightnn$G_Weight
+names(x) <- varGweightnn$Probe
+xres <- x
+probe_index_gw <- names(xres)
+
+yx_train <- cbind(y_train,x_train[,probe_index])
+colnames(yx_train)[1] <- "y"
+n <- colnames(yx_train)
+f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
+nn <- neuralnet(f,data=yx_train,hidden=c(200,100,10),linear.output=F, act.fct = "logistic", err.fct = "ce")
+save(nn, file = "nn_gw.r")
+
+#########
+
+setwd("~/R/ageing/datasets/rheumatoid_arthritis/females")
+save(yx_train, file = "yx_train.r")
+load("~/R/ageing/datasets/rheumatoid_arthritis/females/yx_train.r")
+
+x_test <- rbind(healthy_test, disease_test)
+y_test <- data.frame(c(rep(0,dim(healthy_test)[1]),rep(1,dim(disease_test)[1]))) # can also use extra blood data in validation
+yx_test <- cbind(y_test,x_test)
+colnames(yx_test)[1] <- "y"
+setwd("~/R/ageing/datasets/rheumatoid_arthritis/females")
+save(yx_test, file = "yx_test.r")
+load("~/R/ageing/datasets/rheumatoid_arthritis/females/yx_test.r")
 
 
-pr_nn <- compute(nn,yx_test[,2:5001])
+# validation
+
+pr_nn <- compute(nn,yx_test[,probe_index])
 prdf <- cbind(pr_nn$net.result,yx_test[,1])
 prdf <- data.frame(prdf)
 prdf$delta <- prdf$X2 - prdf$X1 
@@ -62,51 +197,19 @@ hist(prdf$delta)
 sum(abs(prdf$delta)>0.5)
 
 
+# 105/148= 71%
+# n_disease 56
+# n_control 72
+# n_total 148
 
-gw <- nn$generalized.weights[[1]]
-vinputs <- apply(gw, MARGIN = 2, FUN = var, na.rm=T)
-table(vinputs > 1)
-hist(vinputs)
-summary(vinputs)
-tmp <- data.frame(colnames(yx_train)[2:5001], vinputs)
-colnames(tmp) <- c("Probe","G_Weight")
-varGweightnn <- tmp
-varGweightnn <- varGweightnn[order(-varGweightnn$G_Weight),]
+#TP = "has disease 1 and predict disease 1": 65
+TP = sum(prdf$X2 == 1 & prdf$X1 > 0.5)
 
-x <- varGweightnn$G_Weight
-names(x) <- varGweightnn$Probe
+#FP = "does not have disease 0 and predict disease 1": 32
+FP = sum(prdf$X2 == 0 & prdf$X1 > 0.5)
 
-source("~/R/ageing/functions/double_mad_from_med.r")
+#TN = "does not have disease 0 and predict disease 0": 40
+TN = sum(prdf$X2 == 0 & prdf$X1 < 0.5)
 
-xres <- x[DoubleMADsFromMedian(x) > 3]
-probe_index <- names(xres)
-save(probe_index, file="single_gse_gw_probe_index.r")
-
-yx_train_gw <- yx_train[,probe_index]
-yx_train_gw <- cbind(yx_train[,1],yx_train_gw)
-colnames(yx_train_gw)[1] <- "y"
-setwd("~/R/ageing/datasets/rheumatoid_arthritis/females/")
-save(yx_train_gw, file = "yx_train_single_gse_gw.r")
-n <- colnames(yx_train_gw)
-f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
-nn_gw <- neuralnet(f,data=yx_train_gw,hidden=c(200,100,10),linear.output=F, act.fct = "logistic", err.fct = "ce")
-save(nn_gw, file="nn_yx_train_single_gse_gw.r")
-
-delta <- as.numeric(data.frame(nn_gw$net.result)[,1])-as.numeric(nn_gw$response)
-sum(abs(delta>0.5))
-
-
-load("~/R/ageing/datasets/rheumatoid_arthritis/females/yx_test_single_gse.r")
-yx_test_gw <- yx_test[,probe_index]
-yx_test_gw <- cbind(yx_test[,1],yx_test_gw)
-colnames(yx_test_gw)[1] <- "y"
-setwd("~/R/ageing/datasets/rheumatoid_arthritis/females")
-save(yx_test_gw, file = "yx_test_single_gse_gw.r")
-pr_nn_gw <- compute(nn_gw,yx_test_gw[,2:391])
-prdf <- cbind(pr_nn_gw$net.result,yx_test_gw[,1])
-prdf <- data.frame(prdf)
-prdf$delta <- prdf$X2 - prdf$X1 
-hist(prdf$delta)
-sum(abs(prdf$delta)>0.5)
-
-#124/148 = 84%
+#FN = "has disease 1 and predict disease 0": 11
+FN = sum(prdf$X2 == 1 & prdf$X1 < 0.5)

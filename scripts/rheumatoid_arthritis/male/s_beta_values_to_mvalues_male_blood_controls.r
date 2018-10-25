@@ -4,9 +4,7 @@ load("~/R/ageing/datasets/rheumatoid_arthritis/males/blood_controls_complete_mal
 # define the m.value function. The m.value function reduces heteroscedasticity among illumina methylation array
 # beta values by converting beta values into m values. 
 
-m.values = function(x){
-  log2(x/(1-x))
-}
+source("~/R/ageing/functions/m_values.r")
 
 #This is to remove the first column which containes illumina array probe names.
 

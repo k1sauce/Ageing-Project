@@ -1,16 +1,17 @@
-#load in the beta values of the blood tissue controls for males
-load("~/R/ageing/datasets/rheumatoid_arthritis/males/blood_controls_complete_male.r")
+
+#TODO script is not apart of current pipeline
+
+
+#load in the beta values of the blood tissue controls for females
+load("~/R/ageing/datasets/rheumatoid_arthritis/females/blood_controls_complete_female.r")
 
 # define the m.value function. The m.value function reduces heteroscedasticity among illumina methylation array
 # beta values by converting beta values into m values. 
-
-m.values = function(x){
-  log2(x/(1-x))
-}
+source("~/R/ageing/functions/m_values.r")
 
 #This is to remove the first column which containes illumina array probe names.
 
-tmp <- blood_controls_complete_male
+tmp <- blood_controls_complete_female
 tmp <- tmp[,-1]
 
 #This for loop creates an index which tells us which columns already contain m values.
@@ -28,8 +29,8 @@ tmp[,1254:2560] <- m.values(tmp[,1254:2560])
 # I cap all m values within the range of 6 to -6 as m values range to infinity. 
 tmp[tmp > 6] <- 6
 tmp[tmp < -6] <- -6
-# Save the modified dataset in ~/r/ageing/datasets as blood_controls_mvalues_male.r
-setwd("~/R/ageing/datasets/rheumatoid_arthritis/males")
-blood_controls_mvalues_male <- tmp
-save(blood_controls_mvalues_male, file= "blood_controls_mvalues_male.r")
+# Save the modified dataset in ~/r/ageing/datasets as blood_controls_mvalues_female.r
+setwd("~/R/ageing/datasets/rheumatoid_arthritis/females")
+blood_controls_mvalues_female <- tmp
+save(blood_controls_mvalues_female, file= "blood_controls_mvalues_female.r")
 

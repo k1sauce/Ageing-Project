@@ -19,7 +19,7 @@ save(POLYNOMIALS5k, file = "POLYNOMIALS5k.r")
 
 #create data table for 5000 selected probes m-values and control samples
 load("~/R/ageing/datasets/rheumatoid_arthritis/females/RES5k.r")
-load("~/R/ageing/datasets/rheumatoid_arthritis/females/blood_controls_mvalues_female_probes_removed.r")
+load("~/R/ageing/datasets/rheumatoid_arthritis/females/blood_controls_mvalues_female_probes_removed2.r")
 mvalues_5k_blood_controls_females <- blood_controls_mvalues_female_preprocessed[rownames(RES5k),]
 
 setwd("~/R/ageing/datasets/rheumatoid_arthritis/females")
