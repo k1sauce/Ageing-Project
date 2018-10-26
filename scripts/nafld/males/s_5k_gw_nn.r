@@ -42,6 +42,7 @@ n <- colnames(yx_train)
 f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
 nn <- neuralnet(f,data=yx_train,hidden=c(50),linear.output=F, act.fct = "logistic", err.fct = "ce")
 save(nn, file = "nn_gw.r")
+load("nn_gw.r")
 
 
 #########
@@ -69,7 +70,14 @@ hist(prdf$delta)
 sum(abs(prdf$delta)>0.5)
 
 save(probe_index_gw,file = "probe_index_gw.r")
+load('probe_index_gw.r')
 
+prdf <- prdf[order(-prdf$X1),]
+rank <- rev(seq_along(prdf$X1))
+library(pROC)
+roc_obj <- roc(prdf$X2, rank)
+auc(roc_obj)
+# Area under the curve: 0.98125
 # 26/28 = 92%
 # n_disease 8
 # n_control 20

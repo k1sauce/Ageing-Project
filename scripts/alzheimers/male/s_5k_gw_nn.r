@@ -127,19 +127,25 @@ save(probe_index4001to5000, file = "probe_index4001to5000.r")
 
 probe_index <- c(probe_index1to1000,probe_index1001to2000,probe_index2001to3000,probe_index3001to4000,probe_index4001to5000)
 save(probe_index, file = "probe_index.r")
+load("probe_index.r")
 
 yx_train <- cbind(y_train,x_train[,probe_index])
 colnames(yx_train)[1] <- "y"
 n <- colnames(yx_train)
 f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
-nn <- neuralnet(f,data=yx_train,hidden=c(200,100,10),linear.output=F, act.fct = "logistic", err.fct = "ce")
-
-
+nn <- neuralnet(f,data=yx_train,hidden=c(60,50,10),linear.output=F, act.fct = "logistic", err.fct = "ce")
+save(nn, file = "nn_trained.r")
 #########
 
 setwd("~/R/ageing/datasets/alzheimers/males")
 save(yx_train, file = "yx_train.r")
 load("~/R/ageing/datasets/alzheimers/males/yx_train.r")
+
+prdf <- cbind(nn$net.result[[1]],nn$response)
+prdf <- data.frame(prdf)
+prdf$delta <- prdf$y - prdf$V1
+hist(prdf$delta)
+sum(abs(prdf$delta) > 0.5)
 
 x_test <- rbind(healthy_test, disease_test)
 y_test <- data.frame(c(rep(0,dim(healthy_test)[1]),rep(1,dim(disease_test)[1]))) # can also use extra blood data in validation
@@ -151,32 +157,40 @@ load("~/R/ageing/datasets/alzheimers/males/yx_test.r")
 
 
 # validation
-
+load("nn_trained.r")
 pr_nn <- compute(nn,yx_test[,probe_index])
+
+
 prdf <- cbind(pr_nn$net.result,yx_test[,1])
 prdf <- data.frame(prdf)
-prdf$delta <- prdf$X2 - prdf$X1 
-hist(prdf$delta)
+prdf$delta <- prdf[,2] - prdf[,1] 
+#hist(prdf$delta)
 sum(abs(prdf$delta)>0.5)
-
-
 # 15/195 = 92%
+
+prdf <- prdf[order(-prdf$X1),]
+rank <- rev(seq_along(prdf$X1))
+library(pROC)
+roc_obj <- roc(prdf$X2, rank)
+auc(roc_obj)
+#Area under the curve: 0.9536842
+
 # n_disease 5
 # n_control 190
 # n_total 195
 
 #TP = "has disease 1 and predict disease 1": 5
 TP = sum(prdf$X2 == 1 & prdf$X1 > 0.5)
-
+TP
 #FP = "does not have disease 0 and predict disease 1": 15
 FP = sum(prdf$X2 == 0 & prdf$X1 > 0.5)
-
+FP
 #TN = "does not have disease 0 and predict disease 0": 175
 TN = sum(prdf$X2 == 0 & prdf$X1 < 0.5)
-
+TN
 #FN = "has disease 1 and predict disease 0": 0
 FN = sum(prdf$X2 == 1 & prdf$X1 < 0.5)
-
+FN
 
 
 
@@ -200,19 +214,21 @@ library(tensorflow)
 # Data Preparation ---------------------------------------------------
 
 batch_size <- 16
-epochs <- 30
+epochs <- 100
 
-x_train <- as.matrix(yx_train[,2:5001])
+x_train <- as.matrix(yx_train[,2:356])
 y_train <- to_categorical(as.matrix(yx_train[,1]),2)
-x_test <- as.matrix(yx_test[,2:5001])
+x_test <- as.matrix(yx_test[,2:356])
 y_test <- to_categorical(as.matrix(yx_test[,1]),2)
 
 # Define Model --------------------------------------------------------------
 
 model <- keras_model_sequential()
 model %>% 
-  layer_dense(units = 500, activation = 'relu', input_shape = c(5000)) %>% 
-  layer_dropout(rate = 0.5)
+  layer_dense(units = 200, activation = 'relu', input_shape = c(355)) %>% 
+  layer_dropout(rate = 0.3)  %>% 
+  layer_dense(units = 100, activation = 'relu') %>% 
+  layer_dropout(rate = 0.3)  %>% 
   layer_dense(units = 2, activation = 'softmax')
 
 summary(model)
@@ -226,11 +242,21 @@ model %>% compile(
 history <- model %>% fit(
   x_train, y_train,
   batch_size = batch_size,
-  epochs = epochs,
-  validation_split = 0
+  epochs = 250,
+  validation_split = 0,
+  class_weight = list("0"=1,"1"=38),
 )
 
 plot(history)
+
+predx <- predict(model, x = x_test)
+prdf <- cbind(predx,y_test[,2])
+prdf <- data.frame(prdf)
+prdf$delta <- prdf[,2] - prdf[,1] 
+#hist(prdf$delta)
+#sum(abs(prdf$delta)>0.5)
+FN = sum(prdf$X2 == 1 & prdf$X1 < 0.5)
+FN
 
 
 

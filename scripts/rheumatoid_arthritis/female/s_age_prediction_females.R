@@ -118,11 +118,12 @@ save_model_hdf5(model, filepath = "~/R/ageing/datasets/rheumatoid_arthritis/fema
                 include_optimizer = TRUE)
 model <- load_model_hdf5(filepath = "~/R/ageing/datasets/rheumatoid_arthritis/females/tf_model_female_age.r", custom_objects = NULL, compile = TRUE)
 load("~/R/ageing/datasets/rheumatoid_arthritis/females/vec_age_female_diseased.r")
-x_diseased <- t(as.matrix(age_yx_diseased))
+x_diseased <- as.matrix(age_yx_diseased)
 y_diseased <- vec_age_female_diseased
 
 predydis <- predict(model, x = x_diseased)
-mean(predydis - y_diseased) #10.65 years
+mean(abs(predydis - y_diseased)) #10.65 years
+cor(y = predydis, x = y_diseased) # 0.28
 hist(predydis - y_diseased)
 plot(y = predydis, x = y_diseased, xlab = "True Age", ylab = "Predicted Age", main = "Female Arthritis - Diseased")
 

@@ -23,7 +23,8 @@ age_yx_test_controls <- age_yx_controls[,-control_index]
 
 save(age_yx_train_controls,file = "~/R/ageing/datasets/rheumatoid_arthritis/males/age_yx_train_controls.r")
 save(age_yx_test_controls, file = "~/R/ageing/datasets/rheumatoid_arthritis/males/age_yx_test_controls.r")
-
+load("~/R/ageing/datasets/rheumatoid_arthritis/males/age_yx_train_controls.r")
+load("~/R/ageing/datasets/rheumatoid_arthritis/males/age_yx_test_controls.r")
 
 #glmnet
 load("~/R/ageing/datasets/rheumatoid_arthritis/males/age_yx_train_controls.r")

@@ -74,39 +74,7 @@ varGweightnn <- varGweightnn[order(-varGweightnn$G_Weight),]
 
 x <- varGweightnn$G_Weight
 names(x) <- varGweightnn$Probe
-
-DoubleMAD <- function(x, zero.mad.action="warn"){
-  # The zero.mad.action determines the action in the event of an MAD of zero.
-  # Possible values: "stop", "warn", "na" and "warn and na".
-  x         <- x[!is.na(x)]
-  m         <- median(x)
-  abs.dev   <- abs(x - m)
-  left.mad  <- median(abs.dev[x<=m])
-  right.mad <- median(abs.dev[x>=m])
-  if (left.mad == 0 || right.mad == 0){
-    if (zero.mad.action == "stop") stop("MAD is 0")
-    if (zero.mad.action %in% c("warn", "warn and na")) warning("MAD is 0")
-    if (zero.mad.action %in% c(  "na", "warn and na")){
-      if (left.mad  == 0) left.mad  <- NA
-      if (right.mad == 0) right.mad <- NA
-    }
-  }
-  return(c(left.mad, right.mad))
-}
-
-
-DoubleMADsFromMedian <- function(x, zero.mad.action="warn"){
-  # The zero.mad.action determines the action in the event of an MAD of zero.
-  # Possible values: "stop", "warn", "na" and "warn and na".
-  two.sided.mad <- DoubleMAD(x, zero.mad.action)
-  m <- median(x, na.rm=TRUE)
-  x.mad <- rep(two.sided.mad[1], length(x))
-  x.mad[x > m] <- two.sided.mad[2]
-  mad.distance <- abs(x - m) / x.mad
-  mad.distance[x==m] <- 0
-  return(mad.distance)
-}
-
+source("~/R/ageing/functions/double_mad_from_med.r")
 xres <- x[DoubleMADsFromMedian(x) > 3]
 probe_index <- names(xres)
 
@@ -123,6 +91,11 @@ load("nn_yx_train_gw.r")
 
 delta <- as.numeric(data.frame(nn_gw$net.result)[,1])-as.numeric(nn_gw$response)
 sum(abs(delta>0.5))
+prdf <- cbind(nn_gw$net.result[[1]],nn_gw$response)
+prdf <- data.frame(prdf)
+prdf$delta <- prdf$y - prdf$V1
+hist(prdf$delta)
+sum(abs(prdf$delta) > 0.5)
 
 
 load("~/R/ageing/datasets/rheumatoid_arthritis/males/GSE42861_ra/yx_test.r")
@@ -142,7 +115,15 @@ sum(abs(prdf$delta)>0.5)
 save(probe_index, file = "single_gse_gw_probe_index_male.r")
 load("single_gse_gw_probe_index_male.r")
 
-#43/60 = 71%
+prdf <- prdf[order(-prdf$X1),]
+rank <- rev(seq_along(prdf$X1))
+library(pROC)
+roc_obj <- roc(prdf$X2, rank)
+auc(roc_obj)
+
+#Area under the curve: 0.7252503
+
+#43/60 = 70%
 # n_disease 31
 # n_control 29
 # n_total 60

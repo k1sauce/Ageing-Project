@@ -1,7 +1,3 @@
-#TODO
-# clean up readme and RA
-
-
 #############################
 #############################
 #RA
@@ -46,8 +42,8 @@
 #   TN = "does not have disease 0 and predict disease 0": 22
 #   FN = "has disease 1 and predict disease 0": 11
 #
-# 11) s_age_prediction_males.r, healthy samples MAE is 10 years, with average of -10 years higher age,
-# correlation is moderat r = 0.75
+# 11) s_age_prediction_males.r, healthy samples MAE is 5.17 years r 0.945, with average of -10 years higher age in diseased samples,
+# correlation is moderate r = 0.75
 #
 #
 #
@@ -86,7 +82,9 @@
 #   TP = "has disease 1 and predict disease 1": 65
 #   FP = "does not have disease 0 and predict disease 1": 32
 #   TN = "does not have disease 0 and predict disease 0": 40
-# FN = "has disease 1 and predict disease 0": 11
+#   FN = "has disease 1 and predict disease 0": 11
+#   Area under the curve: 0.7786915
+#
 # 11) s_age_prediction_females, healthy samples mean error is 3.04 years r = 0.988
 #   diseased samples are (MAE 10.65) -4.14 years higher on average but no correlation exist, large error
 
@@ -126,6 +124,7 @@
 #7) confounding test with s_nn_confound_test_dataset.r result is 69% multiple classes
 #
 #8) s_5k_gw_nn.r result is 77% accuracy for disease prediction.
+#Area under the curve: 0.8357488
 # 69/90 = 77%
 # n_disease 21
 # n_control 69
@@ -163,6 +162,7 @@
 #7) skip confounding test since like females
 #
 #9) s_5k_gw_nn.r result is 92% accuracy for disease prediction.
+#Area under the curve: 0.9536842
 # 15/195 = 92%
 # n_disease 5
 # n_control 190
@@ -171,7 +171,7 @@
 # FP = "does not have disease 0 and predict disease 1": 15
 # TN = "does not have disease 0 and predict disease 0": 175
 # FN = "has disease 1 and predict disease 0": 0
-#10) s_age_prediction_males # r = 0.981, MAE = 3.5 years
+#10) s_age_prediction_males # r = 0.983, MAE = 3.3 years
 
 
 #####################################################################
@@ -250,7 +250,7 @@
 #   FP = "does not have disease 0 and predict disease 1": 0
 #   TN = "does not have disease 0 and predict disease 0": 8
 #   FN = "has disease 1 and predict disease 0": 0
-# 11) s_age_prediction_males, healthy samples mean error is 8.3 years r = 0.947
+# 11) s_age_prediction_males, healthy samples mean error is 6.72 years r = 0.94
 #   diseased samples are 11 years higher on average but no correlation exist
 
 

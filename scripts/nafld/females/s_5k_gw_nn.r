@@ -127,6 +127,7 @@ save(probe_index4001to5000, file = "probe_index4001to5000.r")
 
 probe_index <- c(probe_index1to1000,probe_index1001to2000,probe_index2001to3000,probe_index3001to4000,probe_index4001to5000)
 save(probe_index, file = "probe_index.r")
+load("probe_index.r")
 
 yx_train <- cbind(y_train,x_train[,probe_index])
 colnames(yx_train)[1] <- "y"
@@ -154,7 +155,7 @@ n <- colnames(yx_train)
 f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
 nn <- neuralnet(f,data=yx_train,hidden=c(100),linear.output=F, act.fct = "logistic", err.fct = "ce")
 save(nn, file = "nn_pi.r")
-
+load("nn_pi.r")
 #########
 
 setwd("~/R/ageing/datasets/nafld/females")
@@ -179,13 +180,20 @@ prdf$delta <- prdf$X2 - prdf$X1
 hist(prdf$delta)
 sum(abs(prdf$delta)>0.5)
 
+prdf <- prdf[order(-prdf$X1),]
+rank <- rev(seq_along(prdf$X1))
+library(pROC)
+roc_obj <- roc(prdf$X2, rank)
+auc(roc_obj)
+# Area under the curve: 1
 
-# 11/11 = 100%
-# n_disease 3
-# n_control 8
-# n_total 11
 
-#TP = "has disease 1 and predict disease 1": 3
+# 31/31 = 100%
+# n_disease 8
+# n_control 23
+# n_total 31
+
+#TP = "has disease 1 and predict disease 1": 23
 TP = sum(prdf$X2 == 1 & prdf$X1 > 0.5)
 
 #FP = "does not have disease 0 and predict disease 1": 0

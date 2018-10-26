@@ -68,8 +68,11 @@ model <- keras_model_sequential()
 model %>% 
   
   layer_dense(units = 368, activation = 'relu', input_shape = c(368)) %>% 
-  layer_dropout(rate = 0.2) %>% 
+  layer_dropout(rate = 0.25) %>% 
   layer_dense(units = 200, activation = 'relu') %>% 
+  layer_dense(units = 200, activation = 'relu') %>% 
+  layer_dense(units = 200, activation = 'relu') %>% 
+  layer_dense(units = 100, activation = 'relu') %>% 
   layer_dense(units = 1)
 
 summary(model)
@@ -80,7 +83,7 @@ model %>% compile(
   metrics = "mean_absolute_error"
 )
 batch_size <- 32 
-epochs <- 50
+epochs <- 250
 # Fit model to data
 history <- model %>% fit(
   x_train, y_train,
@@ -97,8 +100,8 @@ hist(trainagep - y_train)
 cor(y = trainagep, x = y_train)
 
 testagep <- predict(model, x = x_test)
-mean(abs(testagep - y_test)) # mean error is 8.33 years
-cor(y = testagep, x = y_test) # r = 0.947
+mean(abs(testagep - y_test)) # mean error is 6.72 years
+cor(y = testagep, x = y_test) # r = 0.94
 plot(y = testagep, x = y_test, xlab = "True Age", ylab = "Predicted Age", main = "Female Liver - Healthy")
 hist(testagep - y_test)
 
@@ -123,13 +126,12 @@ save_model_hdf5(model, filepath = "~/R/ageing/datasets/nafld/females/tf_model_fe
                 include_optimizer = TRUE)
 model <- load_model_hdf5(filepath = "~/R/ageing/datasets/nafld/females/tf_model_female_age.r", custom_objects = NULL, compile = TRUE)
 load("~/R/ageing/datasets/nafld/females/vec_age_female_diseased.r")
-x_diseased <- t(as.matrix(age_yx_diseased))
+x_diseased <- as.matrix(age_yx_diseased)
 y_diseased <- vec_age_female_diseased
 
-predydis <- predict(model, x = t(x_diseased))
-mean(predydis - y_diseased) # +11.5 years but no correlation r = 0.569
+predydis <- predict(model, x = x_diseased)
+mean(abs(predydis - y_diseased)) # +9.2 years , r 0.66
 cor(y = predydis, x = y_diseased) 
-hist(predydis - y_diseased)
 plot(y = predydis, x = y_diseased, xlab = "True Age", ylab = "Predicted Age", main = "Female Liver - Diseased")
 
 # 

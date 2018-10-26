@@ -77,17 +77,20 @@ n <- colnames(yx_train_gw)
 f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
 nn_gw <- neuralnet(f,data=yx_train_gw,hidden=c(100,10),linear.output=F, act.fct = "logistic", err.fct = "ce")
 save(nn_gw, file="nn_yx_train_gw.r")
+load("nn_yx_train_gw.r")
 
 delta <- as.numeric(data.frame(nn_gw$net.result)[,1])-as.numeric(nn_gw$response)
 sum(abs(delta)>0.5)
 
 
+load("gw_probe_index.r")
 load("~/R/ageing/datasets/alzheimers/females/yx_test.r")
 yx_test_gw <- yx_test[,probe_index]
 yx_test_gw <- cbind(yx_test[,1],yx_test_gw)
 colnames(yx_test_gw)[1] <- "y"
 setwd("~/R/ageing/datasets/alzheimers/females")
 save(yx_test_gw, file = "yx_test_gw.r")
+load("yx_test_gw.r")
 pr_nn_gw <- compute(nn_gw,yx_test_gw[,2:390])
 prdf <- cbind(pr_nn_gw$net.result,yx_test_gw[,1])
 prdf <- data.frame(prdf)
@@ -95,10 +98,16 @@ prdf$delta <- prdf$X2 - prdf$X1
 hist(prdf$delta)
 sum(abs(prdf$delta)>0.5)
 
-#69/90 = 77%
-#n_disease 21
-#n_control 69
-#n_total 90
+prdf <- prdf[order(-prdf$X1),]
+rank <- rev(seq_along(prdf$X1))
+library(pROC)
+roc_obj <- roc(prdf$X2, rank)
+auc(roc_obj)
+# Area under the curve: 0.8357488
+# 69/90 = 77%
+# n_disease 21
+# n_control 69
+# n_total 90
 
 #TP = "has disease 1 and predict disease 1": 15
 TP = sum(prdf$X2 == 1 & prdf$X1 > 0.5)

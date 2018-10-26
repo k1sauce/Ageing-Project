@@ -75,7 +75,7 @@ model %>% compile(
   metrics = "mean_absolute_error"
 )
 batch_size <- 32 
-epochs <- 50
+epochs <- 55
 # Fit model to data
 history <- model %>% fit(
   x_train, y_train,
@@ -93,7 +93,7 @@ cor(y = trainagep, x = y_train)
 
 testagep <- predict(model, x = x_test)
 mean(abs(testagep - y_test)) # 4.8 years
-cor(y = testagep, x = y_test) # r = 0.968
+cor(y = testagep, x = y_test) # r = 0.957
 plot(y = testagep, x = y_test, xlab = "True Age", ylab = "Predicted Age", main = "Female Prefrontal Cortex - Healthy")
 hist(testagep - y_test)
 
@@ -118,10 +118,12 @@ save_model_hdf5(model, filepath = "~/R/ageing/datasets/alzheimers/females/tf_mod
                 include_optimizer = TRUE)
 model <- load_model_hdf5(filepath = "~/R/ageing/datasets/alzheimers/females/tf_model_female_age.r", custom_objects = NULL, compile = TRUE)
 load("~/R/ageing/datasets/alzheimers/females/vec_age_female_diseased.r")
-x_diseased <- t(as.matrix(age_yx_diseased))
+x_diseased <- as.matrix(age_yx_diseased)
 y_diseased <- vec_age_female_diseased
 
 predydis <- predict(model, x = x_diseased)
-mean(predydis - y_diseased)
+mean(abs(predydis - y_diseased)) # 4.77
+cor(y = predydis, x = y_diseased) # r = 0.865
+plot(y = predydis, x = y_diseased, xlab = "True Age", ylab = "Predicted Age", main = "Female Prefrontal Cortex - Diseased")
 hist(predydis - y_diseased)
 # 
