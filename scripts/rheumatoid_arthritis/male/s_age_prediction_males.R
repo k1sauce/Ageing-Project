@@ -126,8 +126,8 @@ x_diseased <- as.matrix(age_yx_diseased)
 y_diseased <- vec_age_male_blood_diseased
 
 predydis <- predict(model, x = x_diseased)
-mean(predydis - y_diseased) # - 10 years below expected, 
-mean(abs(predydis - y_diseased)) # 10 years MAE
+mean(predydis - y_diseased) # - 10 years below expected, -10.41769
+mean(abs(predydis - y_diseased)) # 10 years MAE 10.8923
 hist(predydis - y_diseased)
 plot(y = predydis, x = y_diseased, xlab = "True Age", ylab = "Predicted Age", main = "Male Arthritis - Diseased")
 cor(y = predydis, x = y_diseased) # r = 0.75

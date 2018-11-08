@@ -127,8 +127,9 @@ x_diseased <- as.matrix(age_yx_diseased)
 y_diseased <- vec_age_male_diseased
 
 predydis <- predict(model, x = x_diseased)
-mean(abs(predydis - y_diseased)) # +20.28 years but no correlation r = 0.23
-cor(y = predydis, x = y_diseased) 
+mean(abs(predydis - y_diseased)) # +20.28 years 
+mean(predydis - y_diseased) # 14.84
+cor(y = predydis, x = y_diseased) # but no correlation r = 0.23
 hist(predydis - y_diseased)
 plot(y = predydis, x = y_diseased, xlab = "True Age", ylab = "Predicted Age", main = "Male Liver - Diseased")
 

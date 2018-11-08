@@ -128,6 +128,7 @@ y_diseased <- vec_age_male_diseased
 
 predydis <- predict(model, x = x_diseased)
 mean(abs(predydis - y_diseased)) # 4.77 years
+mean(predydis - y_diseased) # -1.988 years
 plot(y = predydis, x = y_diseased, xlab = "True Age", ylab = "Predicted Age", main = "Male Prefrontal Cortex - Diseased")
 cor(y = predydis, x = y_diseased) # r - 0.733
 hist(predydis - y_diseased)

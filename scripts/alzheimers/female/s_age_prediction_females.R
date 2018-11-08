@@ -123,6 +123,7 @@ y_diseased <- vec_age_female_diseased
 
 predydis <- predict(model, x = x_diseased)
 mean(abs(predydis - y_diseased)) # 4.77
+mean(predydis - y_diseased) # -2.3
 cor(y = predydis, x = y_diseased) # r = 0.865
 plot(y = predydis, x = y_diseased, xlab = "True Age", ylab = "Predicted Age", main = "Female Prefrontal Cortex - Diseased")
 hist(predydis - y_diseased)

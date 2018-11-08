@@ -6,20 +6,14 @@ xnam <- cf$CpGmarker
 xnam <- xnam[-1]
 
 # load in the samples used for age predicti0n validation
-load("~/R/ageing/datasets/rheumatoid_arthritis/males/age_yx_test_controls.r")
+load("~/R/ageing/datasets/alzheimers/females/age_yx_test_controls.r")
 ages <- as.numeric(age_yx_test_controls[1,])
 gsms <- colnames(age_yx_test_controls)
 
 # load in the betas from the original dataset
-load("~/R/ageing/datasets/rheumatoid_arthritis/males/blood_controls_complete_male.r")
-tmpdf <- blood_controls_complete_male[xnam,]
-
-# also add the missing controls from GSE42861
-load("~/R/ageing/datasets/rheumatoid_arthritis/males/GSE42861_ra/male_controls_betas.r")
-tmpsinglegse <- male_controls_betas[xnam,]
-
-#cbind the controls
-tmpdf <- cbind(tmpdf,tmpsinglegse)
+load("~/R/ageing/datasets/alzheimers/females/beta_values_fc_ad.r")
+tmpdf <- fcmerge5[xnam,]
+rm(fcmerge5)
 
 # select the samples used to validate age
 tmpdf <- tmpdf[,gsms]
@@ -39,11 +33,6 @@ for (i in 1:length(index)){
   print(max(tmp[,col]))
 }
 
-#All the samples in the index are actually m-values
-#so convert to beta values
-source("~/R/ageing/functions/b_values.r")
-tmp[,index] <- b.values(tmp[,index])
-
 #
 int <- as.numeric(as.character(cf$CoefficientTraining[1]))
 vec_coef <- as.numeric(as.character(cf$CoefficientTraining[-1]))
@@ -54,10 +43,10 @@ meth_data <- tmp
 # calculate the horvath age
 horvath_age <- c()
 for(i in 1:dim(meth_data)[2]){
-a <- meth_data[,i]*vec_coef
-a <- sum(a, na.rm = T)
-a <- a + int
-horvath_age <- c(horvath_age, a)}
+  a <- meth_data[,i]*vec_coef
+  a <- sum(a, na.rm = T)
+  a <- a + int
+  horvath_age <- c(horvath_age, a)}
 
 #invert it back to the estimate age in years
 inverse.F <- function(me_age){
@@ -76,13 +65,13 @@ horvath_age <- as.numeric(horvath_age)
 names(horvath_age) <- colnames(meth_data)
 
 #score
-cor(y = horvath_age, x = ages) # 0.9372
-mean(abs(horvath_age - ages)) # 5.5653 years
+cor(y = horvath_age, x = ages) # 0.9470752
+mean(abs(horvath_age - ages)) # 7.353359 years
 
 
 #also on diseased samples
-load("~/R/ageing/datasets/rheumatoid_arthritis/males/GSE42861_ra/male_diseased_betas.r")
-tmpsinglegsed <- male_diseased_betas[xnam,]
+load("~/R/ageing/datasets/alzheimers/females/brain_diseased_betavalues_female.r")
+tmpsinglegsed <- brain_diseased_betavalues_female[xnam,]
 tmp <- tmpsinglegsed
 index <- c()
 for (i in 1:dim(tmp)[2]){
@@ -118,8 +107,8 @@ horvath_age <- as.numeric(horvath_age)
 names(horvath_age) <- colnames(meth_data)
 
 #score
-load("~/R/ageing/datasets/rheumatoid_arthritis/males/vec_age_male_blood_diseased.r")
-ages <- vec_age_male_blood_diseased
-cor(y = horvath_age, x = ages) # 0.867
-mean(abs(horvath_age - ages)) # 4.06 years
-mean(horvath_age - ages) #0.6576
+load("~/R/ageing/datasets/alzheimers/females/vec_age_female_diseased.r")
+ages <- vec_age_female_diseased
+cor(y = horvath_age, x = ages) # 0.666
+mean(abs(horvath_age - ages)) # 17.87 years
+mean(horvath_age - ages) # -17.87 years

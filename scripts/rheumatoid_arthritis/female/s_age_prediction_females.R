@@ -122,6 +122,7 @@ x_diseased <- as.matrix(age_yx_diseased)
 y_diseased <- vec_age_female_diseased
 
 predydis <- predict(model, x = x_diseased)
+mean(predydis - y_diseased) #10.65 years
 mean(abs(predydis - y_diseased)) #10.65 years
 cor(y = predydis, x = y_diseased) # 0.28
 hist(predydis - y_diseased)
