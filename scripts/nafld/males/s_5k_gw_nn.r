@@ -40,7 +40,7 @@ yx_train <- cbind(y_train,x_train[,probe_index_gw])
 colnames(yx_train)[1] <- "y"
 n <- colnames(yx_train)
 f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
-nn <- neuralnet(f,data=yx_train,hidden=c(50),linear.output=F, act.fct = "logistic", err.fct = "ce")
+nn <- neuralnet(f,data=yx_train,hidden=c(100),linear.output=F, act.fct = "logistic", err.fct = "ce")
 save(nn, file = "nn_gw.r")
 load("nn_gw.r")
 

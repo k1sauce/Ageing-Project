@@ -153,32 +153,32 @@ n <- colnames(yx_train)
 f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
 nn <- neuralnet(f,data=yx_train,hidden=c(100),linear.output=F, act.fct = "logistic", err.fct = "ce")
 
-gw <- nn$generalized.weights[[1]]
-vinputs <- apply(gw, MARGIN = 2, FUN = var, na.rm=T)
-table(vinputs > 1)
-summary(vinputs)
-tmp <- data.frame(colnames(yx_train)[2:269], vinputs)
-colnames(tmp) <- c("Probe","G_Weight")
-varGweightnn <- tmp
-varGweightnn <- varGweightnn[order(-varGweightnn$G_Weight),]
-x <- varGweightnn$G_Weight
-names(x) <- varGweightnn$Probe
-xres <- x
-probe_index_gw <- names(xres)
+#gw <- nn$generalized.weights[[1]]
+#vinputs <- apply(gw, MARGIN = 2, FUN = var, na.rm=T)
+#table(vinputs > 1)
+#summary(vinputs)
+#tmp <- data.frame(colnames(yx_train)[2:269], vinputs)
+#colnames(tmp) <- c("Probe","G_Weight")
+#varGweightnn <- tmp
+#varGweightnn <- varGweightnn[order(-varGweightnn$G_Weight),]
+#x <- varGweightnn$G_Weight
+#names(x) <- varGweightnn$Probe
+#xres <- x
+#probe_index_gw <- names(xres)
 
-yx_train <- cbind(y_train,x_train[,probe_index])
-colnames(yx_train)[1] <- "y"
-n <- colnames(yx_train)
-f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
-nn <- neuralnet(f,data=yx_train,hidden=c(200,100,10),linear.output=F, act.fct = "logistic", err.fct = "ce")
-save(nn, file = "nn_gw.r")
-load("nn_gw.r")
+#yx_train <- cbind(y_train,x_train[,probe_index])
+#colnames(yx_train)[1] <- "y"
+#n <- colnames(yx_train)
+#f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
+#nn <- neuralnet(f,data=yx_train,hidden=c(200,100,10),linear.output=F, act.fct = "logistic", err.fct = "ce")
+#save(nn, file = "nn_gw.r")
+#load("nn_gw.r")
 
-prdf <- cbind(nn$net.result[[1]],nn$response)
-prdf <- data.frame(prdf)
-prdf$delta <- prdf$y - prdf$V1
-hist(prdf$delta)
-sum(abs(prdf$delta) > 0.5)
+#prdf <- cbind(nn$net.result[[1]],nn$response)
+#prdf <- data.frame(prdf)
+#prdf$delta <- prdf$y - prdf$V1
+#hist(prdf$delta)
+#sum(abs(prdf$delta) > 0.5)
 #########
 
 setwd("~/R/ageing/datasets/rheumatoid_arthritis/females")

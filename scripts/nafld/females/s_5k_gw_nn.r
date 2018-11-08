@@ -135,27 +135,27 @@ n <- colnames(yx_train)
 f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
 nn <- neuralnet(f,data=yx_train,hidden=c(100),linear.output=F, act.fct = "logistic", err.fct = "ce")
 
-gw <- nn$generalized.weights[[1]]
-vinputs <- apply(gw, MARGIN = 2, FUN = var, na.rm=T)
-table(vinputs > 1)
-summary(vinputs)
-tmp <- data.frame(colnames(yx_train)[2:388], vinputs)
-colnames(tmp) <- c("Probe","G_Weight")
-varGweightnn <- tmp
-varGweightnn <- varGweightnn[order(-varGweightnn$G_Weight),]
-x <- varGweightnn$G_Weight
-names(x) <- varGweightnn$Probe
-source("~/R/ageing/functions/double_mad_from_med.r")
-xres <- x[DoubleMADsFromMedian(x) > 1]
-probe_index_gw <- names(xres)
+#gw <- nn$generalized.weights[[1]]
+#vinputs <- apply(gw, MARGIN = 2, FUN = var, na.rm=T)
+#table(vinputs > 1)
+#summary(vinputs)
+#tmp <- data.frame(colnames(yx_train)[2:388], vinputs)
+#colnames(tmp) <- c("Probe","G_Weight")
+#varGweightnn <- tmp
+#varGweightnn <- varGweightnn[order(-varGweightnn$G_Weight),]
+#x <- varGweightnn$G_Weight
+#names(x) <- varGweightnn$Probe
+#source("~/R/ageing/functions/double_mad_from_med.r")
+#xres <- x[DoubleMADsFromMedian(x) > 1]
+#probe_index_gw <- names(xres)
 
-yx_train <- cbind(y_train,x_train[,probe_index])
-colnames(yx_train)[1] <- "y"
-n <- colnames(yx_train)
-f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
-nn <- neuralnet(f,data=yx_train,hidden=c(100),linear.output=F, act.fct = "logistic", err.fct = "ce")
-save(nn, file = "nn_pi.r")
-load("nn_pi.r")
+#yx_train <- cbind(y_train,x_train[,probe_index])
+#colnames(yx_train)[1] <- "y"
+#n <- colnames(yx_train)
+#f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
+#nn <- neuralnet(f,data=yx_train,hidden=c(100),linear.output=F, act.fct = "logistic", err.fct = "ce")
+#save(nn, file = "nn_pi.r")
+#load("nn_pi.r")
 #########
 
 setwd("~/R/ageing/datasets/nafld/females")
