@@ -152,6 +152,8 @@ colnames(yx_train)[1] <- "y"
 n <- colnames(yx_train)
 f <- as.formula(paste("y ~", paste(n[!n %in% "y"], collapse = " + ")))
 nn <- neuralnet(f,data=yx_train,hidden=c(100),linear.output=F, act.fct = "logistic", err.fct = "ce")
+#save(nn, file = "nn_gw.r")
+#load("nn_gw.r")
 
 #gw <- nn$generalized.weights[[1]]
 #vinputs <- apply(gw, MARGIN = 2, FUN = var, na.rm=T)
@@ -193,6 +195,8 @@ setwd("~/R/ageing/datasets/rheumatoid_arthritis/females")
 save(yx_test, file = "yx_test.r")
 load("~/R/ageing/datasets/rheumatoid_arthritis/females/yx_test.r")
 
+#
+
 
 # validation
 
@@ -208,6 +212,7 @@ rank <- rev(seq_along(prdf$X1))
 library(pROC)
 roc_obj <- roc(prdf$X2, rank)
 auc(roc_obj)
+plot.roc(roc_obj,threshold='best', print.thres = 'best')
 #Area under the curve: 0.7786915
 
 # 105/148= 71%

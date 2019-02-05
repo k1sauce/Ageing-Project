@@ -199,7 +199,7 @@ cat('Test accuracy:', score[[2]], '\n')
 ###################################################################
 install.packages("randomForest")
 library(randomForest)
-ram.rf=randomForest(y ~ . , data = yx_train, mtry = 70, ntree = 500, importance = T)
+ram.rf=randomForest(y ~ . , data = yxt, mtry = 70, ntree = 500, importance = T)
 
 pr.rf <- predict(ram.rf, yx_test)
 prdf <- cbind(pr.rf, yx_test$y)
@@ -212,7 +212,7 @@ sum(prdf$delta < -0.5)
 
 #elastic net glmnet
 
-ra_train_glm = cv.glmnet(x = as.matrix(yx_train_gw[,2:431]), y = as.matrix(yx_train_gw[,1]), family = "binomial", type.measure = "auc", nfolds = 5, lambda = seq(0.001,0.1,by = 0.001),
+ra_train_glm = cv.glmnet(x = as.matrix(yxt[,2]), y = as.matrix(yxt[,1]), family = "binomial", type.measure = "auc", nfolds = 5, lambda = seq(0.001,0.1,by = 0.001),
                          standardize=FALSE )
 plot(ra_train_glm)
 
@@ -241,11 +241,14 @@ load("~/R/ageing/datasets/rheumatoid_arthritis/males/GSE42861_ra/ra_prediction_p
 
 cv_5 = trainControl(method = "cv", number = 5)
 
-yx_train$y <- as.factor(yx_train$y)
-yx_test$y <- as.factor(yx_test$y)
+yxt <- as.data.frame(yxt)
+yxt$y <- as.factor(yxt$y)
+yxv <- as.data.frame(yxv)
+yxv$y <- as.factor(yxv$y)
 
 
-def_elnet <- train(y ~ ., data = yx_train,
+
+def_elnet <- train(y ~ ., data = as.matrix(yxt),
   method = "glmnet",
   trControl = cv_5,
   tuneLength = 10
@@ -255,7 +258,7 @@ get_best_result = function(caret_fit) {
   best = which(rownames(caret_fit$results) == rownames(caret_fit$bestTune))
   best_result = caret_fit$results[best, ]
   rownames(best_result) = NULL
-  best_result
+  return(best_result)
 }
 
 #75% acc
@@ -264,8 +267,8 @@ calc_acc = function(actual, predicted) {
   mean(actual == predicted)
 }
 
-calc_acc(actual = yx_test$y,
-         predicted = predict(def_elnet, newdata = yx_test))
+calc_acc(actual = yxv$y,
+         predicted = predict(def_elnet, newdata = as.matrix(yxv)))
 #70% accuracy
 
 

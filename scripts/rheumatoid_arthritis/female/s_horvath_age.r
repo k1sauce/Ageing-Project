@@ -112,8 +112,10 @@ inverse.F <- function(me_age){
   }
 }
 
+anti.trafo= function(x,adult.age=20) { ifelse(x<0, (1+adult.age)*exp(x)-1, (1+adult.age)*x+adult.age) }
+
 #unlist and name
-horvath_age <- lapply(horvath_age,FUN=inverse.F)
+horvath_age <- lapply(horvath_age,FUN=anti.trafo)
 horvath_age <- as.numeric(horvath_age)
 names(horvath_age) <- colnames(meth_data)
 
