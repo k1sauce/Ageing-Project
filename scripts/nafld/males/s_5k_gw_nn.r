@@ -75,8 +75,10 @@ load('probe_index_gw.r')
 prdf <- prdf[order(-prdf$X1),]
 rank <- rev(seq_along(prdf$X1))
 library(pROC)
-roc_obj <- roc(prdf$X2, rank)
+roc_obj <- roc(prdf$X2, rank, plot = T)
 auc(roc_obj)
+g <- ggroc(roc_obj)
+g
 # Area under the curve: 0.98125
 # 26/28 = 92%
 # n_disease 8
