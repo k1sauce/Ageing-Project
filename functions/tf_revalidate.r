@@ -1,6 +1,6 @@
 # to use this function set probe_ptp to the probe of interest and also need to set wd and load yx_train and yx_test
 
-revalidate <- function(){
+revalidate <- function(batch_size,epochs,fp){
   
   #train data
   yt <- yx_train$y
@@ -19,8 +19,6 @@ revalidate <- function(){
   
   # Data Preparation ---------------------------------------------------
   
-  batch_size <- 32
-  epochs <- 3500
   
   x_train <- as.matrix(yxt[,2:dim(yxt)[2]])
   y_train <- as.matrix(yxt[,1])
@@ -53,6 +51,7 @@ revalidate <- function(){
     x_train, y_train,
     batch_size = batch_size,
     epochs = epochs,
+    callbacks = callback_model_checkpoint(filepath = fp, monitor = "val_acc", save_best_only = TRUE),
     validation_data = list(x_test,y_test)
   )
   
@@ -64,5 +63,5 @@ revalidate <- function(){
   cat('Test loss:', score[[1]], '\n')
   cat('Test accuracy:', score[[2]], '\n')
   acc <- score[[2]]
-  return(acc)
+  return(list(acc, model))
 }

@@ -1,14 +1,37 @@
-#set the probe
 probe_ptp <- c("cg24500428","cg22730626","cg06890761","cg13909612")
-#set the correct dir
-setwd("~/R/ageing/datasets/rheumatoid_arthritis/females")
-#load the data
 load("~/R/ageing/datasets/rheumatoid_arthritis/females/yx_train.r")
 load("~/R/ageing/datasets/rheumatoid_arthritis/females/yx_test.r")
-# run the revalidation
 source("~/R/ageing/functions/tf_revalidate.r")
-revalidate()
-# 0.65 accuracy
+model <- revalidate(32,3500, fp="~/Downloads/weights.{epoch:02d}-{val_acc:.2f}.hdf5")
+model <- load_model_hdf5("~/Downloads/weights.1330-0.66.hdf5")
+
+#validation data
+yv <- yx_test$y
+xv <- yx_test[,probe_ptp]
+yxv <- cbind(yv,xv)
+colnames(yxv) <- c("y",paste0(probe_ptp))
+
+x_test <- as.matrix(yxv[,2:dim(yxv)[2]])
+y_test <- as.matrix(yxv[,1])
+
+tmp <- predict(model, x_test)
+
+pr_nn <- predict(model,x_test)
+prdf <- cbind(pr_nn,y_test)
+prdf <- data.frame(prdf)
+prdf$delta <- prdf[,1] - prdf[,2]
+prdf <- prdf[order(-prdf$X1),]
+rank <- rev(seq_along(prdf$X1))
+rocobject <- roc(prdf$X2, rank, plot = F)
+
+library(pROC)
+
+ggroc(rocobject) +
+  ggtitle("A - RA/Healthy Females \nValidation Set ROC - PTPRN2 set probes only") +
+  geom_abline(intercept = 1, slope = 1, color = "red", linetype="dashed", size=0.3)  +
+  theme(legend.position = "none", 
+        plot.title = element_text(size = 8), text = element_text(size=8))
+# Age plots
 
 #predict age with the marker
 load("~/R/ageing/datasets/rheumatoid_arthritis/females/age_yx_train_controls.r")
@@ -52,5 +75,10 @@ history <- model %>% fit(
   epochs = epochs,
   validation_data = list(x_test,y_test))
 
-plot(history)
+
 #val is MAE 4 years
+pr_nn <- predict(model,x_test)
+prdf <- cbind(pr_nn,y_test)
+prdf <- data.frame(prdf)
+plot(prdf$X1 ~ prdf$X2, xlab="Age", ylab = "Predicted Age", main= "PTPRN2 Set Probes Neural Network Age Estimation")
+abline(a = 0, b = 1)

@@ -5,7 +5,7 @@ load(file="~/R/ageing/datasets/coef_horvath.r")
 xnam <- cf$CpGmarker
 xnam <- xnam[-1]
 
-# load in the samples used for age predicti0n validation
+# load in the samples used for age prediction validation
 load("~/R/ageing/datasets/rheumatoid_arthritis/females/age_yx_test_controls.r")
 ages <- as.numeric(age_yx_test_controls[1,])
 gsms <- colnames(age_yx_test_controls)
@@ -75,11 +75,13 @@ horvath_age <- lapply(horvath_age,FUN=inverse.F)
 horvath_age <- as.numeric(horvath_age)
 names(horvath_age) <- colnames(meth_data)
 
+
 #score
 cor(y = horvath_age, x = ages) # 0.917
 mean(abs(horvath_age - ages)) # 6.129 years
 
-
+#save the horvath age predictions of age_yx_test_controls
+save(horvath_age,file = "~/R/ageing/datasets/rheumatoid_arthritis/females/age_yx_test_controls_horvath_estimate.r")
 #also on diseased samples
 load("~/R/ageing/datasets/rheumatoid_arthritis/females/GSE42861_ra/female_diseased_betas.r")
 tmpsinglegsed <- female_diseased_betas[xnam,]
@@ -112,12 +114,12 @@ inverse.F <- function(me_age){
   }
 }
 
-anti.trafo= function(x,adult.age=20) { ifelse(x<0, (1+adult.age)*exp(x)-1, (1+adult.age)*x+adult.age) }
-
 #unlist and name
-horvath_age <- lapply(horvath_age,FUN=anti.trafo)
+horvath_age <- lapply(horvath_age,FUN=inverse.F)
 horvath_age <- as.numeric(horvath_age)
 names(horvath_age) <- colnames(meth_data)
+
+save(horvath_age, file="~/R/ageing/datasets/rheumatoid_arthritis/females/GSE42861_ra/female_diseased_betas_horvath_estimate.r")
 
 #score
 load("~/R/ageing/datasets/rheumatoid_arthritis/females/vec_age_female_diseased.r")

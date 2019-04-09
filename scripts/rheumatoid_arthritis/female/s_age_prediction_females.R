@@ -114,15 +114,18 @@ tmp <- probe_index
 age_yx_diseased <- na_fill_mvalues_female_blood_diseased[tmp,]
 save(age_yx_diseased, file = "~/R/ageing/datasets/rheumatoid_arthritis/females/age_yx_disease.r")
 load("~/R/ageing/datasets/rheumatoid_arthritis/females/age_yx_disease.r")
-save_model_hdf5(model, filepath = "~/R/ageing/datasets/rheumatoid_arthritis/females/tf_model_female_age.r", overwrite = TRUE,
-                include_optimizer = TRUE)
+#save_model_hdf5(model, filepath = "~/R/ageing/datasets/rheumatoid_arthritis/females/tf_model_female_age.r", overwrite = TRUE,
+#                include_optimizer = TRUE)
 model <- load_model_hdf5(filepath = "~/R/ageing/datasets/rheumatoid_arthritis/females/tf_model_female_age.r", custom_objects = NULL, compile = TRUE)
 load("~/R/ageing/datasets/rheumatoid_arthritis/females/vec_age_female_diseased.r")
 x_diseased <- as.matrix(age_yx_diseased)
 y_diseased <- vec_age_female_diseased
 
 predydis <- predict(model, x = x_diseased)
-mean(predydis - y_diseased) #10.65 years
+names(predydis) <- rownames(x_diseased)
+page <- predydis
+save(page, file = "~/R/ageing/datasets/rheumatoid_arthritis/females/age_yx_disease_page_estimate.r")
+mean(predydis - y_diseased) #-4.14 years
 mean(abs(predydis - y_diseased)) #10.65 years
 cor(y = predydis, x = y_diseased) # 0.28
 hist(predydis - y_diseased)
