@@ -64,6 +64,9 @@ horvath_age <- lapply(horvath_age,FUN=inverse.F)
 horvath_age <- as.numeric(horvath_age)
 names(horvath_age) <- colnames(meth_data)
 
+save(horvath_age,file = "~/R/ageing/datasets/alzheimers/males/age_yx_test_controls_horvath_estimate.r")
+
+
 #score
 cor(y = horvath_age, x = ages) # 0.9460418
 mean(abs(horvath_age - ages)) # 6.495214 years
@@ -105,6 +108,9 @@ inverse.F <- function(me_age){
 horvath_age <- lapply(horvath_age,FUN=inverse.F)
 horvath_age <- as.numeric(horvath_age)
 names(horvath_age) <- colnames(meth_data)
+
+save(horvath_age,file = "~/R/ageing/datasets/alzheimers/males/male_diseased_betas_horvath_estimate.r")
+
 
 #score
 load("~/R/ageing/datasets/alzheimers/males/vec_age_male_diseased.r")

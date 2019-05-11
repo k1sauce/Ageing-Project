@@ -38,6 +38,8 @@ ggplot(data = m, aes(x=m$age, y=m$value, color=m$variable)) +
   scale_colour_manual(name="Model", labels=c("Nueral Net", "Horvath"), values=c("#F8766D", "#00BFC4")) +
   ggtitle("Model Comparison - Female blood controls")
 
+
+### disease
 raf_d <- c("~/R/ageing/datasets/rheumatoid_arthritis/females/vec_age_female_diseased.r", 
            "~/R/ageing/datasets/rheumatoid_arthritis/females/GSE42861_ra/female_diseased_betas_horvath_estimate.r",
            "~/R/ageing/datasets/rheumatoid_arthritis/females/age_yx_disease_page_estimate.r")

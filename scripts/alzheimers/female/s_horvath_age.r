@@ -68,7 +68,7 @@ names(horvath_age) <- colnames(meth_data)
 cor(y = horvath_age, x = ages) # 0.9470752
 mean(abs(horvath_age - ages)) # 7.353359 years
 
-
+save(horvath_age,file = "~/R/ageing/datasets/alzheimers/females/age_yx_test_controls_horvath_estimate.r")
 #also on diseased samples
 load("~/R/ageing/datasets/alzheimers/females/brain_diseased_betavalues_female.r")
 tmpsinglegsed <- brain_diseased_betavalues_female[xnam,]
@@ -105,6 +105,8 @@ inverse.F <- function(me_age){
 horvath_age <- lapply(horvath_age,FUN=inverse.F)
 horvath_age <- as.numeric(horvath_age)
 names(horvath_age) <- colnames(meth_data)
+
+save(horvath_age,file = "~/R/ageing/datasets/alzheimers/females/female_diseased_betas_horvath_estimate.r")
 
 #score
 load("~/R/ageing/datasets/alzheimers/females/vec_age_female_diseased.r")
