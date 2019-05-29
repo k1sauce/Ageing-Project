@@ -126,6 +126,10 @@ x_diseased <- as.matrix(age_yx_diseased)
 y_diseased <- vec_age_male_blood_diseased
 
 predydis <- predict(model, x = x_diseased)
+predydis <- as.vector(predydis)
+names(predydis) <- rownames(x_diseased)
+page <- predydis
+save(page, file = "~/R/ageing/datasets/rheumatoid_arthritis/males/age_yx_disease_page_estimate.r")
 mean(predydis - y_diseased) # - 10 years below expected, -10.41769
 mean(abs(predydis - y_diseased)) # 10 years MAE 10.8923
 hist(predydis - y_diseased)

@@ -130,6 +130,11 @@ x_diseased <- as.matrix(age_yx_diseased)
 y_diseased <- vec_age_female_diseased
 
 predydis <- predict(model, x = x_diseased)
+predydis <- as.vector(predydis)
+names(predydis) <- rownames(x_diseased)
+page <- predydis
+save(page, file = "~/R/ageing/datasets/nafld/females/age_yx_disease_page_estimate.r")
+
 mean(abs(predydis - y_diseased)) # +9.2 years 
 mean(predydis - y_diseased) # 7.722 
 cor(y = predydis, x = y_diseased) # r 0.66

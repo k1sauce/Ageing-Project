@@ -127,6 +127,10 @@ x_diseased <- as.matrix(age_yx_diseased)
 y_diseased <- vec_age_male_diseased
 
 predydis <- predict(model, x = x_diseased)
+predydis <- as.vector(predydis)
+names(predydis) <- rownames(x_diseased)
+page <- predydis
+save(page, file = "~/R/ageing/datasets/alzheimers/males/age_yx_disease_page_estimate.r")
 mean(abs(predydis - y_diseased)) # 4.77 years
 mean(predydis - y_diseased) # -1.988 years
 plot(y = predydis, x = y_diseased, xlab = "True Age", ylab = "Predicted Age", main = "Male Prefrontal Cortex - Diseased")

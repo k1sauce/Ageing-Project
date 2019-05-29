@@ -122,6 +122,10 @@ x_diseased <- as.matrix(age_yx_diseased)
 y_diseased <- vec_age_female_diseased
 
 predydis <- predict(model, x = x_diseased)
+predydis <- as.vector(predydis)
+names(predydis) <- rownames(x_diseased)
+page <- predydis
+save(page, file = "~/R/ageing/datasets/alzheimers/females/age_yx_disease_page_estimate.r")
 mean(abs(predydis - y_diseased)) # 4.77
 mean(predydis - y_diseased) # -2.3
 cor(y = predydis, x = y_diseased) # r = 0.865
