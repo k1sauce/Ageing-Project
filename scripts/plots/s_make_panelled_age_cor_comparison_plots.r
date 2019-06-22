@@ -1,3 +1,9 @@
+library('keras')
+library('tensorflow')
+library('ggplot2')
+library('gridExtra')
+library('reshape')
+
 loadRData <- function(fileName){
   #loads an RData file, and returns it
   load(fileName)
@@ -35,7 +41,10 @@ make_age_cor_comparison_plots <- function(m, title){
     geom_abline(slope = 1, intercept = 0, linetype=2, size=0.3) +
     xlab("Age") + ylab("Predicted Age") +
     scale_colour_manual(name="Model", labels=c("Nueral Net", "Horvath"), values=c("#F8766D", "#00BFC4")) +
-    ggtitle(title)
+    ggtitle(title) + 
+    theme_minimal() +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+          panel.background = element_blank(), axis.line = element_line(colour = "black"))
   return(p)
 }
 
@@ -87,7 +96,7 @@ pnam <- make_age_cor_comparison_plots(m = m_lm, title = title_lm)
 
 
 gggg <- arrangeGrob(praf, padf, pnaf, pram, padm, pnam, ncol=3)
-ggsave(filename = "~/R/ageing/datasets/Plot_data/age_cor_comparison_plots.png",
+ggsave(filename = "~/R/ageing/datasets/Plot_data/age_cor_comparison_plots_latest.png",
        plot = gggg,
        device = png(),
        width = 640,

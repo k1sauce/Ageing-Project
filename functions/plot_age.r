@@ -18,4 +18,3 @@ plot_age <- function(X, PX,xlab,ylab,ggtitle,shape,pointsize,textsize){
     ggtitle(ggtitle) +
     theme(legend.position = "none", plot.title = element_text(size = textsize), text = element_text(size=textsize))
 }
-
